@@ -9,6 +9,7 @@ class TimerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<TimerBloc>(
+      // We pass something which kind of act as the source into the bloc.
       create: (_) => TimerBloc(ticker: const Ticker()),
       child: const TimerView(),
     );
@@ -61,7 +62,14 @@ class Actions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<TimerBloc, TimerState>(
+      // This is optional and used for the optimization
+      // Invokes at each time when the state gets changed
+      // If buildWhen is true this rebuilds. If it is False, there will be no rebuild
+      // You can set a function to this which returns a boolean value
+      // Here, this runs if the state type changed.
       buildWhen: (prev, state) => prev.runtimeType != state.runtimeType,
+      // builder gices you tue current state
+      // You can render what you want according to that
       builder: (context, state) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -71,6 +79,11 @@ class Actions extends StatelessWidget {
                 child: const Icon(Icons.play_arrow),
                 onPressed: () => context
                     .read<TimerBloc>()
+                    // add method is used to trigger an event in the BLoC, which in turn causes the BLoC to update its state and emit new states to the UI.
+                    // Here we can pass an event to add
+                    // There is an on function in TimerBloc construction it regostered eventHandlers for events
+                    // So this events will pass to corresponding event hanlder and that event handler will run
+                    // Eventually that will emit the new state
                     .add(TimerStarted(duration: state.duration)),
               ),
             ],
